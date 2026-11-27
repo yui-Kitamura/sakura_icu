@@ -53,6 +53,8 @@ GitHubで公開しているので [GitHub Actionsのビルドページ](https://
 `sakura.sln`を開いてビルドできます。  
 詳細は [ビルド方法](./tools/build.md) を参照。
 
+このフォークの日本語単語移動については、[Windows ICU による単語移動](./tools/icu-word-navigation.md) を参照。
+
 ### Static code analysis
 
 サクラエディタプロジェクトではいくつかの静的解析サービスを利用しています。
