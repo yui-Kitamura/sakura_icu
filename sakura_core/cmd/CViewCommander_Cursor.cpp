@@ -27,6 +27,134 @@
 #include "mem/CMemoryIterator.h"	// @@@ 2002.09.28 YAZAKI
 #include "CSelectLang.h"
 
+#include <bit>
+#include <cstdint>
+#include <memory>
+#include <optional>
+
+namespace {
+
+// Windows 10 version 1903 introduced the combined ICU DLL. Resolve only the
+// ICU C ABI used here so older Windows versions can still start the editor.
+class IcuWordBreaks {
+	struct BreakIterator;
+	using Open = BreakIterator* (__cdecl*)(int32_t, const char*, const wchar_t*, int32_t, int32_t*);
+	using Close = void (__cdecl*)(BreakIterator*);
+	using Step = int32_t (__cdecl*)(BreakIterator*, int32_t);
+	using IsBoundary = int8_t (__cdecl*)(BreakIterator*, int32_t);
+	using IsWhitespace = int8_t (__cdecl*)(int32_t);
+
+	const HMODULE m_module = ::LoadLibraryExW(L"icu.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+	const Open m_open = Resolve<Open>("ubrk_open");
+	const Close m_close = Resolve<Close>("ubrk_close");
+	const Step m_following = Resolve<Step>("ubrk_following");
+	const Step m_preceding = Resolve<Step>("ubrk_preceding");
+	const IsBoundary m_isBoundary = Resolve<IsBoundary>("ubrk_isBoundary");
+	const IsWhitespace m_isWhitespace = Resolve<IsWhitespace>("u_isUWhiteSpace");
+
+	template <typename Function>
+	Function Resolve(const char* name) const
+	{
+		return m_module ? std::bit_cast<Function>(::GetProcAddress(m_module, name)) : nullptr;
+	}
+
+public:
+	~IcuWordBreaks()
+	{
+		if (m_module) {
+			::FreeLibrary(m_module);
+		}
+	}
+
+	explicit operator bool() const
+	{
+		return m_open && m_close && m_following && m_preceding && m_isBoundary && m_isWhitespace;
+	}
+
+	std::optional<int> FindBoundary(const wchar_t* text, int length, int offset, bool forward) const
+	{
+		constexpr int32_t characterBreak = 0; // UBRK_CHARACTER
+		constexpr int32_t wordBreak = 1;      // UBRK_WORD
+		constexpr int32_t done = -1;          // UBRK_DONE
+		int32_t error = 0;
+		const std::unique_ptr<BreakIterator, Close> words(m_open(wordBreak, "ja", text, length, &error), m_close);
+		const std::unique_ptr<BreakIterator, Close> characters(m_open(characterBreak, "ja", text, length, &error), m_close);
+		if (error > 0 || !words || !characters) { // Positive UErrorCode values are failures.
+			return std::nullopt;
+		}
+
+		const auto step = forward ? m_following : m_preceding;
+		const int direction = forward ? 1 : -1;
+		for (int word = step(words.get(), offset); word != done; word = step(words.get(), offset)) {
+			// Keep ':' and '=' separate, even when ICU joins them to a word.
+			for (int pos = offset + direction; pos != word; pos += direction) {
+				if ((text[pos] == L':' || text[pos] == L'=' || text[pos - 1] == L':' || text[pos - 1] == L'=') &&
+					!m_isWhitespace(text[pos]) && m_isBoundary(characters.get(), pos)) {
+					return pos;
+				}
+			}
+			if (word == 0 || word == length ||
+				(!m_isWhitespace(text[word]) && m_isBoundary(characters.get(), word))) {
+				return word;
+			}
+			offset = word;
+		}
+		return std::nullopt;
+	}
+};
+
+} // namespace
+
+bool CViewCommander::TryMoveIcuWord(bool forward)
+{
+	if (!GetDllShareData().m_Common.m_sGeneral.m_bUseIcuWordNavigation) {
+		return false;
+	}
+	static const IcuWordBreaks icu;
+	if (!icu) {
+		return false;
+	}
+
+	const CLogicPoint from = GetCaret().GetCaretLogicPos();
+	CLogicPoint to = from;
+	const auto& lines = GetDocument()->m_cDocLineMgr;
+	const auto* line = lines.GetLine(from.GetY2());
+	const int length = line ? line->GetLengthWithoutEOL() : 0;
+	const int offset = from.GetX2();
+	if (forward && offset >= length) {
+		if (!line || !line->GetEol().IsValid()) {
+			return true;
+		}
+		// A final newline also has a caret position at the start of the empty EOF line.
+		to.Set(CLogicInt(0), from.GetY2() + 1);
+	} else if (!forward && offset == 0) {
+		if (from.GetY2() == 0) {
+			return true;
+		}
+		const CLogicInt previous = from.GetY2() - 1;
+		const auto* previousLine = lines.GetLine(previous);
+		if (!previousLine) {
+			return false;
+		}
+		to.Set(CLogicInt(previousLine->GetLengthWithoutEOL()), previous);
+	} else if (offset > length) {
+		to.x = CLogicInt(length);
+	} else {
+		const auto boundary = icu.FindBoundary(line->GetPtr(), length, offset, forward);
+		if (!boundary) {
+			return false;
+		}
+		to.x = CLogicInt(*boundary);
+	}
+
+	CLayoutPoint layout;
+	GetDocument()->m_cLayoutMgr.LogicToLayout(to, &layout);
+	GetCaret().GetAdjustCursorPos(&layout);
+	GetCaret().MoveCursor(layout, true, _CARETMARGINRATE, layout.y == GetCaret().GetCaretLayoutPos().y);
+	GetCaret().m_nCaretPosX_Prev = GetCaret().GetCaretLayoutPos().GetX2();
+	return true;
+}
+
 void CViewCommander::Command_MOVECURSOR(CLogicPoint pos, int option)
 {
 	if( pos.GetX2() < 0 || pos.GetY2() < 0 ){
@@ -427,6 +555,10 @@ void CViewCommander::Command_WORDLEFT( bool bSelect )
 		}
 	}
 
+	if( !bSelect && TryMoveIcuWord(false) ){
+		return;
+	}
+
 	const CLayout* pcLayout;
 	pcLayout = GetDocument()->m_cLayoutMgr.SearchLineByLayoutY( GetCaret().GetCaretLayoutPos().GetY2() );
 	if( nullptr == pcLayout ){
@@ -505,6 +637,10 @@ void CViewCommander::Command_WORDRIGHT( bool bSelect )
 			m_pCommanderView->GetSelectionInfo().SetBoxSelect(false);
 		}
 	}
+	if( !bSelect && TryMoveIcuWord(true) ){
+		return;
+	}
+
 	bool	bTryAgain = false;
 try_again:;
 	nCurLine = GetCaret().GetCaretLayoutPos().GetY2();

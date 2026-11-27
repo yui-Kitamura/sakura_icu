@@ -293,6 +293,7 @@ void CPropGeneral::SetData( HWND hwndDlg )
 
 	/* 単語単位で移動するときに、単語の両端で止まるか */
 	::CheckDlgButton( hwndDlg, IDC_CHECK_STOPS_BOTH_ENDS_WHEN_SEARCH_WORD, m_Common.m_sGeneral.m_bStopsBothEndsWhenSearchWord );
+	::CheckDlgButton( hwndDlg, IDC_CHECK_ICU_WORD_NAVIGATION, m_Common.m_sGeneral.m_bUseIcuWordNavigation );
 
 	/* 段落単位で移動するときに、段落の両端で止まるか */
 	::CheckDlgButton( hwndDlg, IDC_CHECK_STOPS_BOTH_ENDS_WHEN_SEARCH_PARAGRAPH, m_Common.m_sGeneral.m_bStopsBothEndsWhenSearchParagraph );
@@ -385,6 +386,7 @@ int CPropGeneral::GetData( HWND hwndDlg )
 
 	/* 単語単位で移動するときに、単語の両端で止まるか */
 	m_Common.m_sGeneral.m_bStopsBothEndsWhenSearchWord = ::IsDlgButtonChecked( hwndDlg, IDC_CHECK_STOPS_BOTH_ENDS_WHEN_SEARCH_WORD );
+	m_Common.m_sGeneral.m_bUseIcuWordNavigation = ::IsDlgButtonChecked( hwndDlg, IDC_CHECK_ICU_WORD_NAVIGATION ) == BST_CHECKED;
 	//	2007.10.08 genta マウスクリックでアクティブになったときはカーソルをクリック位置に移動しない (2007.10.02 by nasukoji)
 	m_Common.m_sGeneral.m_bNoCaretMoveByActivation = ::IsDlgButtonChecked( hwndDlg, IDC_CHECK_NOMOVE_ACTIVATE_BY_MOUSE );
 

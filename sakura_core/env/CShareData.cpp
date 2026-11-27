@@ -226,6 +226,7 @@ void CShareData::InitShareData()
 			sGeneral.m_bIsINSMode = true;				/* 挿入／上書きモード */
 			sGeneral.m_bIsFreeCursorMode = false;		/* フリーカーソルモードか */	//Oct. 29, 2000 JEPRO 「なし」に変更
 
+			sGeneral.m_bUseIcuWordNavigation = false;
 			sGeneral.m_bStopsBothEndsWhenSearchWord = FALSE;	/* 単語単位で移動するときに、単語の両端で止まるか */
 			sGeneral.m_bStopsBothEndsWhenSearchParagraph = FALSE;	/* 単語単位で移動するときに、単語の両端で止まるか */
 

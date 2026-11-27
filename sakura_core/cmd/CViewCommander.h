@@ -44,6 +44,8 @@ public:
 	HWND GetCommanderViewHwnd(HWND hWnd) const;
 
 private:
+	bool TryMoveIcuWord(bool forward);
+
 	CEditView*		m_pCommanderView;
 	CSMacroMgr*		m_pcSMacroMgr;
 
