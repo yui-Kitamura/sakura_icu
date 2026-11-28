@@ -502,6 +502,7 @@ void CShareData_IO::ShareData_IO_Common( CDataProfile& cProfile )
 	//cProfile.IOProfileData( pszSecName, L"bIsINSMode"				, common.m_bIsINSMode );
 	cProfile.IOProfileData( pszSecName, L"bIsFreeCursorMode"		, common.m_sGeneral.m_bIsFreeCursorMode );
 	
+	cProfile.IOProfileData( pszSecName, L"bUseIcuWordNavigation"	, common.m_sGeneral.m_bUseIcuWordNavigation );
 	cProfile.IOProfileData( pszSecName, L"bStopsBothEndsWhenSearchWord"	, common.m_sGeneral.m_bStopsBothEndsWhenSearchWord );
 	cProfile.IOProfileData( pszSecName, L"bStopsBothEndsWhenSearchParagraph"	, common.m_sGeneral.m_bStopsBothEndsWhenSearchParagraph );
 	//	Oct. 27, 2000 genta

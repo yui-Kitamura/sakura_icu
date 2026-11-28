@@ -350,6 +350,7 @@ MATCHER(IsInitializedCommonSettingGeneral, "Checks if CommonSetting_General is p
 	EXPECT_THAT(sGeneral.m_nCaretType, 0);
 	EXPECT_THAT(sGeneral.m_bIsINSMode, IsTrue());
 	EXPECT_THAT(sGeneral.m_bIsFreeCursorMode, IsFalse());
+	EXPECT_THAT(sGeneral.m_bUseIcuWordNavigation, IsFalse());
 	EXPECT_THAT(sGeneral.m_bStopsBothEndsWhenSearchWord, IsFalse());
 	EXPECT_THAT(sGeneral.m_bStopsBothEndsWhenSearchParagraph, IsFalse());
 	EXPECT_THAT(sGeneral.m_bCloseAllConfirm, IsFalse());

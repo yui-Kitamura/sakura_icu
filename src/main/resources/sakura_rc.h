@@ -1858,6 +1858,7 @@
 #define IDS_BAD_ALLOC                   35061
 #define IDS_UNHANDLED                   35062
 #define IDS_APPNAME_JP                  35063
+#define IDC_CHECK_ICU_WORD_NAVIGATION   1743
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -1866,7 +1867,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        35064
 #define _APS_NEXT_COMMAND_VALUE         101
-#define _APS_NEXT_CONTROL_VALUE         1743
+#define _APS_NEXT_CONTROL_VALUE         1744
 #define _APS_NEXT_SYMED_VALUE           10000
 #endif
 #endif
