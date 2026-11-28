@@ -11,8 +11,11 @@
 #define BUILD_ENV_NAME "@BUILD_ENV_NAME@"
 #define BUILD_VERSION @BUILD_VERSION@
 
-/* enable 'dev version' macro which will be disabled on release branches */
+#define SAKURA_EDITION_SUFFIX " withICU"
+
+#ifdef _DEBUG
 #define DEV_VERSION
+#endif
 
 // バージョン定義 //
 #define VER_A	@SAKURA_MAJOR_VERSION@	// メジャーバージョン(2固定)

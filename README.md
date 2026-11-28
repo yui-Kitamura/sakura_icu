@@ -1,11 +1,11 @@
-﻿# Sakura Editor
+﻿# Sakura Editor withICU
 
-A free text editor for Windows.  
+Windows 標準 ICU による日本語の単語移動を追加した、[サクラエディタ](https://github.com/sakura-editor/sakura)の非公式フォークです。原作者とライセンスについては [NOTICE](./NOTICE.md) を参照してください。
+
 [![License: Zlib](https://img.shields.io/badge/License-Zlib-lightgrey.svg)](https://opensource.org/licenses/Zlib)
-[![build sakura](https://github.com/sakura-editor/sakura/workflows/build%20sakura/badge.svg)](https://github.com/sakura-editor/sakura/actions?query=workflow%3A%22build+sakura%22)
+[![build sakura](https://github.com/yui-Kitamura/sakura_icu/actions/workflows/build-sakura.yml/badge.svg)](https://github.com/yui-Kitamura/sakura_icu/actions/workflows/build-sakura.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/sakura-editor/sakura/badge)](https://www.codefactor.io/repository/github/sakura-editor/sakura)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sakura-editor_sakura&metric=alert_status)](https://sonarcloud.io/dashboard?id=sakura-editor_sakura)
-[![Github Releases All](https://img.shields.io/github/downloads/sakura-editor/sakura/total.svg)](https://github.com/sakura-editor/sakura/releases "All Releases")
 [![Star History](https://img.shields.io/badge/star-histroy-yellow.svg)](https://star-history.t9t.io/#sakura-editor/sakura)
 
 <!-- 以下は Markdownの参照形式によるリンク の定義です。 -->
@@ -24,7 +24,7 @@ A free text editor for Windows.
 
 <!-- TOC -->
 
-- [Sakura Editor](#sakura-editor)
+- [Sakura Editor withICU](#sakura-editor-withicu)
   - [脆弱性の報告方法](#脆弱性の報告方法)
   - [ダウンロード](#ダウンロード)
   - [開発情報](#開発情報)
@@ -42,9 +42,9 @@ https://github.com/sakura-editor/sakura/security/advisories
 
 ## ダウンロード
 
-リリース版は [Sakura Editor Portal](https://sakura-editor.github.io/) に置いてあります。
+withICU 版は [このフォークの GitHub Releases](https://github.com/yui-Kitamura/sakura_icu/releases) からダウンロードできます。ZIP を展開して `sakura.exe` を起動し、[単語移動の設定](./tools/icu-word-navigation.md)から ICU を有効にします。
 
-GitHubで公開しているので [GitHub Actionsのビルドページ](https://github.com/sakura-editor/sakura/actions/workflows/build-sakura.yml?query=branch%3Amaster) より開発中の最新版をダウンロードすることもできます。
+本家のリリース版は [Sakura Editor Portal](https://sakura-editor.github.io/) にあります。
 
 ## 開発情報
 

@@ -23,8 +23,10 @@ if "%configuration%" == "Release" (
 
 if "%platform%" == "x64" (
 	set ALPHA=1
+	set VCPKG_TRIPLET=x64-windows-static
 ) else (
 	set ALPHA=0
+	set VCPKG_TRIPLET=x86-windows-static
 )
 
 set ZIP_CMD=%~dp0tools\zip\zip.bat
@@ -197,11 +199,18 @@ mkdir %WORKDIR_EXE%\license\ctags\
 mkdir %WORKDIR_DEV%
 mkdir %WORKDIR_INST%
 copy /Y /B %platform%\%configuration%\sakura.exe %WORKDIR_EXE%\
-copy /Y /B %platform%\%configuration%\*.dll      %WORKDIR_EXE%\
+copy /Y /B %platform%\%configuration%\bregonig.dll      %WORKDIR_EXE%\ || exit /b 1
+copy /Y /B %platform%\%configuration%\migemo.dll        %WORKDIR_EXE%\ || exit /b 1
+copy /Y /B %platform%\%configuration%\sakura_lang_*.dll %WORKDIR_EXE%\ || exit /b 1
 copy /Y /B %platform%\%configuration%\*.pdb      %WORKDIR_DEV%\
 
 : LICENSE
-copy /Y .\LICENSE                                   %WORKDIR_EXE%\license\ > NUL
+copy /Y .\LICENSE                                   %WORKDIR_EXE%\license\ > NUL || exit /b 1
+copy /Y .\NOTICE.md                                 %WORKDIR_EXE%\ > NUL || exit /b 1
+set VCPKG_LICENSES=build\%platform%\CMakeTools\vcpkg_installed\%VCPKG_TRIPLET%\share
+for %%P in (bregonig cmigemo darkmodelib onigmo) do (
+    copy /Y "%VCPKG_LICENSES%\%%P\copyright" "%WORKDIR_EXE%\license\%%P.txt" > NUL || exit /b 1
+)
 
 : bregonig
 set INSTALLER_RESOURCES_BRON=%~dp0installer\temp\bron
